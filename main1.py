@@ -3,6 +3,8 @@ import csv
 import time
 import os
 
+
+medicamento = []
 #inicio do programa
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -119,13 +121,14 @@ def cadastro():
 
         print("\nRegistro finalizado. Você será redirecionado para o nosso menu em breve... ")
         time.sleep(5)
-        menu(username)
+        menu(nome)
 def login():
-    global username
+    global nome
     limpar_tela()
     print("==============================================================")
     print("Login\n\n")
     email_user = input("Email: ")
+    nome = input("Nome: ")
     username = input("Usuário: ")
     password_login = getpass.getpass()
 
@@ -143,7 +146,7 @@ def login():
 
     print("\nLogin bem-sucedido!")
     input("Pressione Enter para acessar nosso menu...")
-    menu(username)
+    menu(nome)
 
 def validar_login(username, password, email_user):
     with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\login.csv', 'r', newline="") as f:
@@ -176,7 +179,7 @@ def introdução():
             introdução()
 
 
-def treino_personalizado(username):
+def treino_personalizado(nome):
     limpar_tela()
     print("==============================================================")
     print("                     SEU TREINO")
@@ -188,7 +191,7 @@ def treino_personalizado(username):
         case '2':
             treino_ganhar_massa()
         case '3':
-            menu(username)
+            menu(nome)
 
             
     
@@ -405,7 +408,7 @@ def dietas_personalizadas():
             imc_obesidade2_3()
 
         case '7':
-            menu(username)
+            dietas()
 
 
 def treino_ganhar_massa():
@@ -428,7 +431,11 @@ def treino_ganhar_massa():
             treino_massa4()
 
         case '5':
-            menu(username)
+            ganhar_massa()
+
+        case _:
+            print("Opção Invalida.")
+            treino_ganhar_massa()
 
 
 def treino_massa1():
@@ -553,7 +560,7 @@ Lembre-se de consultar um profissional de saúde antes de iniciar qualquer progr
 """
     print(treino_sobrepeso)
     input("Pressione Enter para voltar...")
-    treino_personalizado(username)
+    treino_personalizado(nome)
 
 def treino2():
     limpar_tela()
@@ -577,7 +584,7 @@ Lembre-se de consultar um profissional de saúde antes de iniciar qualquer progr
 """
     print(treino_obesidade_grau_1)
     input("Pressione Enter para voltar...")
-    treino_personalizado(username)
+    treino_personalizado(nome)
 
 def treino3_4():
     limpar_tela()
@@ -601,7 +608,7 @@ Lembre-se de consultar um profissional de saúde antes de iniciar qualquer progr
 """
     print(treino_obesidade_grau_3_ou_4)
     input("Pressione Enter para voltar...")
-    treino_personalizado(username)
+    treino_personalizado(nome)
     
 
 def treino_perder_peso():
@@ -624,7 +631,11 @@ def treino_perder_peso():
             treino3_4()
 
         case '5':
-            treino_personalizado(username)
+            treino_personalizado(nome)
+
+        case _:
+            print("Opção invalida.")
+            treino_perder_peso()
 
 def perder_peso():
     print("\nSe o seu objetivo é perder peso, temos as seguintes funcionalidades: ")
@@ -645,36 +656,110 @@ def perder_peso():
 
 def ganhar_massa():
     print("Se o seu objetivo é ganhar massa, temos as seguintes funcionalidades: ")
-    print("1. Planos de Dietas Personalizados\n2. Exercicios para ganho de massa.")
+    print("1. Planos de Dietas Personalizados\n2. Exercicios para ganho de massa.\n3. Voltar")
     esc = input()
     match esc:
         case '1':
             dietas_personalizadas()
         case '2':
             treino_ganhar_massa()
+        case '3':
+            dietas()
+        case _:
+            print("Opção Invalida.")
+            ganhar_massa()
+
 
 
 def dietas():
     limpar_tela()
     print("==============================================================")
     print("                 DIETAS E REFEIÇÕES")
-    print("Bem vindo a sessão de dietas e refeições")
+    print("\nBem vindo a sessão de dietas e refeições")
     print("Qual seu objetivo de dieta?")
-    esc = input("\n1. Perder peso\n2. Ganhar massa\n")
+    esc = input("\n1. Perder peso\n2. Ganhar massa\n3. Voltar")
     match esc:
         case '1':
             perder_peso()
         case '2':
-            print("x")
+            ganhar_massa()
+        case '3':
+            menu(nome)
+        case _:
+            print("Opção Invalida.")
+            dietas()
 
 
+def med_register():
+    global medicamento
+    fecha_loop = "1"
+    limpar_tela()
+    print("==============================================================")
+    print("                REGISTRO DE REMEDIOS")
+    medicamento = []
+    while fecha_loop != "2":
+        remedio = input("\nEscreva o nome do remedio que deseja registrar: \n")
+        medicamento.append(remedio)
+        fecha_loop = input("\nDeseja registrar mais algum remedio?\n1. Sim\n2. Não\n")
+    else:
+        input("Pressione Enter para voltar...")
+        meds()
 
+def med_remover(medicamento):
+    limpar_tela()
+    print("==============================================================")
+    print("                REMOVER MEDICAMENTO")
+    fecha_loop = "1"
+    
+    if not medicamento:
+        print("...")
+        input("\nSem remédios para remover. Pressione Enter para retornar...")
+        meds()
 
+    while fecha_loop != "2":
+        print(medicamento)
+        remover = input("\nQual você deseja remover? (Digite o número correspondente na lista.): \n")
+        remover_int = int(remover)
 
+        if remover_int < 0 or remover_int >= len(medicamento):
+            print("Número inválido. Tente novamente.")
+            continue
 
+        medicamento.remove(medicamento[remover_int])
+        print()
+        print(medicamento)
+        if not medicamento:
+            print("...")
+            input("\nSem remédios para remover. Pressione Enter para retornar...")
+            meds()
+        fecha_loop = input("Deseja remover mais algum remédio?\n1. Sim\n2. Não\n")
+
+    else:
+        input("Pressione Enter para voltar...")
+        meds()
+        
 def meds():
+    limpar_tela()
     print("==============================================================")
     print("                 SEUS MEDICAMENTOS")
+    print("\nBem vindo a sessão de Medicamentos.")
+    esc = input("\n1. Registrar medicamentos\n2. remover medicamento\n3. Voltar\n")
+    match esc:
+        case '1':
+            med_register()
+            
+        case '2':
+            med_remover(medicamento)
+
+        case '3':
+            menu(nome)
+
+
+        case '4':
+            print("Opção Invalida...")
+            time.sleep(2)
+            meds()
+
 
 
 def atendimento_presencial():
@@ -687,19 +772,19 @@ def atendimento_online():
     print("            ATENDIMENTO MEDICO ONLINE")
 
 
-def menu(username):
+def menu(nome):
     limpar_tela()
     print("==============================================================")
     print("                           MENU")
     print("==============================================================")
-    print(f"Bem vindo, {username}")
+    print(f"Bem vindo, {nome}")
     
 
     print("1. Treino Personalizado\n2. Dietas e refeições\n3. Medicamentos\n4. Agendar atendimento medico presencial\n5. Atendimento medico Online\n6. LogOut")
     escolha_menu = input()
     match escolha_menu:
         case '1':
-            treino_personalizado(username)
+            treino_personalizado(nome)
         case '2':
             dietas()
         case '3':
@@ -710,8 +795,6 @@ def menu(username):
             atendimento_online()
         case '6':
             print("Obrigado por usar a VitaTrack. Até logo!")
-        case '5':
-            atendimento_online()
 
 
 introdução()
