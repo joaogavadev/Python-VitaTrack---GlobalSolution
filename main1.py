@@ -111,7 +111,7 @@ def cadastro():
         password2 = getpass.getpass()
     else:
         print("Cadastro finalizado.")
-        with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\logins.csv', 'a', newline="") as f:
+        with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\login.csv', 'a', newline="") as f:
             validador_csv = csv.writer(f)
             validador_csv.writerow(cadastro_registro)
 
@@ -146,7 +146,7 @@ def login():
     menu(username)
 
 def validar_login(username, password, email_user):
-    with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\logins.csv', 'r', newline="") as f:
+    with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\login.csv', 'r', newline="") as f:
         leitor_csv = csv.reader(f)
 
         for linha in leitor_csv:
