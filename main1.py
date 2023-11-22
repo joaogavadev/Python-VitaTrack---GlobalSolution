@@ -2,24 +2,30 @@ import getpass
 import csv
 import time
 import os
-
+import sys
 
 medicamento = []
+consumo_atual = 0
+media_agua = 0
+
+
+
 #inicio do programa
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-
-def registro_info():
+def registro_info(username):
     limpar_tela()
+    global idade
     global nome
+    global peso
 
     print("==============================================================")
     print("Registro")
     print("Bem-vindo ao VitaTrack! Vamos começar registrando algumas informações.")
 
-    nome = input("\nDigite seu primeiro nome: ")
+    nome = username
     peso = input("Digite seu peso (Em kg): ")
     idade = input("Digite sua idade: ")
     altura = input("Digite sua altura: ")
@@ -29,7 +35,7 @@ def registro_info():
 
 #colunas criadas respectivamente: |NOME - PESO - IDADE - ALTURA|
 def criar_csv_usuario(nome, container_userinfo):
-    path = f'C:/Users/gava/Documents/PROGRAMAÇÃO/ARQUIVOS PYTHON/GS/csv/user_dados/{nome}_dados.csv'
+    path = f'{nome}_dados.csv'
     with open(path, 'w', newline='') as f:
         writer = csv.writer(f)
         #infos puxadas + convertendo
@@ -37,12 +43,29 @@ def criar_csv_usuario(nome, container_userinfo):
         writer.writerow(container_userinfo)
     leitor_userinfo(nome)
 
-def leitor_userinfo(nome):
-    path = f'C:/Users/gava/Documents/PROGRAMAÇÃO/ARQUIVOS PYTHON/GS/csv/user_dados/{nome}_dados.csv'
+
+def leitor_userinfo_entrada(nome):
+    global peso
+    global altura
+    path = f'{nome}_dados.csv'
     with open(path, 'r', newline='') as f:
         leitor = csv.reader(f)
         for linha in leitor:
             nome, idade, peso, altura = linha
+            peso = int(peso)
+
+
+
+
+def leitor_userinfo(nome):
+    global peso
+    global altura
+    path = f'{nome}_dados.csv'
+    with open(path, 'r', newline='') as f:
+        leitor = csv.reader(f)
+        for linha in leitor:
+            nome, idade, peso, altura = linha
+            peso = int(peso)
 
     print("\nCalculando seu Índice de Massa Corporal (IMC)...")
     time.sleep(5)
@@ -93,7 +116,6 @@ def leitor_userinfo(nome):
 
 
 
-
 def cadastro():
     limpar_tela()
     print("==============================================================")
@@ -113,17 +135,21 @@ def cadastro():
         password2 = getpass.getpass()
     else:
         print("Cadastro finalizado.")
-        with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\login.csv', 'a', newline="") as f:
+        with open(r'login.csv', 'a', newline="") as f:
             validador_csv = csv.writer(f)
             validador_csv.writerow(cadastro_registro)
 
-        registro_info()
+        registro_info(username)
 
         print("\nRegistro finalizado. Você será redirecionado para o nosso menu em breve... ")
         time.sleep(5)
         menu(nome)
+
+
+
 def login():
     global nome
+    global username
     limpar_tela()
     print("==============================================================")
     print("Login\n\n")
@@ -149,7 +175,7 @@ def login():
     menu(nome)
 
 def validar_login(username, password, email_user):
-    with open(r'C:\Users\gava\Documents\PROGRAMAÇÃO\ARQUIVOS PYTHON\GS\csv\login.csv', 'r', newline="") as f:
+    with open(r'login.csv', 'r', newline="") as f:
         leitor_csv = csv.reader(f)
 
         for linha in leitor_csv:
@@ -158,6 +184,10 @@ def validar_login(username, password, email_user):
 
         return False
         
+
+
+
+
 def introdução():
     limpar_tela()
     print("==============================================================")
@@ -637,6 +667,46 @@ def treino_perder_peso():
             print("Opção invalida.")
             treino_perder_peso()
 
+agua = []
+
+
+def regist_agua(media_agua, consumo_atual):
+    print("==============================================================")
+    print("                REGISTRO DE AGUA")
+    print(f"META DIÁRIA: {media_agua}")
+
+    esc = input("\n\nQuantos ml você gostaria de registrar que consumiu? (Informe apenas números, por favor)\n")
+    esc = int(esc)
+    
+    consumo_atual += esc
+    media_agua -= esc
+    
+    if media_agua <= 0:
+        print("\nParabéns! Você atingiu sua meta diária de consumo de água. Continue com esse hábito saudável para garantir uma vida ainda mais saudável e hidratada!")
+    else:
+        print(f"\nParabéns! Cada vez mais perto! A meta diária agora é: {media_agua} ml")
+    
+    input("Registrado. Pressione Enter para retornar para o menu de monitoramento...")
+    monitoramento_agua(peso, media_agua, consumo_atual)
+
+
+def monitoramento_agua(peso, media_agua, consumo_atual):
+    limpar_tela()
+    print("==============================================================")
+    print("                  MONITORAMENTO DE ÁGUA")
+    print("\nBem-vindo ao seu monitor de água. Aqui, você registra a quantidade de água consumida, e fornecemos a recomendação adequada com base em suas características físicas.")
+    media_agua = peso * 35
+    print(f"\nCom base no seu peso, calculamos que a média de água necessária para o seu dia-a-dia é de {media_agua} ml.")
+    
+    esc = input("\n1. Registrar consumo de água\n2. Voltar\n")
+    
+    match esc:
+        case '1':
+            regist_agua(media_agua, consumo_atual)
+        case '2':
+            perder_peso()
+
+
 def perder_peso():
     print("\nSe o seu objetivo é perder peso, temos as seguintes funcionalidades: ")
     print("1. Planos de Dietas Personalizados\n2. Monitoramento de água\n3. Exercicios para perda de peso\n4. Voltar")
@@ -645,7 +715,7 @@ def perder_peso():
         case '1':
             dietas_personalizadas()
         case '2':
-            print("x")
+            monitoramento_agua(peso, media_agua, consumo_atual)
         case '3':
             treino_perder_peso()
         case '4':
@@ -677,7 +747,7 @@ def dietas():
     print("                 DIETAS E REFEIÇÕES")
     print("\nBem vindo a sessão de dietas e refeições")
     print("Qual seu objetivo de dieta?")
-    esc = input("\n1. Perder peso\n2. Ganhar massa\n3. Voltar")
+    esc = input("\n1. Perder peso\n2. Ganhar massa\n3. Voltar\n")
     match esc:
         case '1':
             perder_peso()
@@ -704,6 +774,19 @@ def med_register():
     else:
         input("Pressione Enter para voltar...")
         meds()
+
+
+
+def idade(nome):
+    global idade
+    path = f'C:/Users/gava/Documents/PROGRAMAÇÃO/ARQUIVOS PYTHON/GS/csv/user_dados/{nome}_dados.csv'
+    with open(path, 'r', newline='') as f:  
+        leitor = csv.reader(f)
+        for linha in leitor:
+            idade = linha[1]    
+
+
+
 
 def med_remover(medicamento):
     limpar_tela()
@@ -760,19 +843,69 @@ def meds():
             time.sleep(2)
             meds()
 
+def registro_horario():
+    limpar_tela()
+    print("==============================================================")
+    print("               REGISTRO DE HORARIO")
+
+    esc = input("Qual desses horarios você deseja agendar?\n1. [08:00]\n2. [12:00]\n3. [15:30]\n4. [18:45]\n5. [21:00]\n6. Voltar\n")
+    match esc:
+        case '1':
+            print("Horario [08:00] registrado! Até lá!")
+            input("Pressione Enter para retornar...")
+            menu(nome)
+
+        case '2':
+            print("Horario [12:00] registrado! Até lá!")
+            input("Pressione Enter para retornar...")
+            menu(nome)
+
+        case '3':
+            print("Horario [15:30] registrado! Até lá!")
+            input("Pressione Enter para retornar...")
+            menu(nome)
+
+        case '4':
+            print("Horario [18:45] registrado! Até lá!")
+            input("Pressione Enter para retornar...")
+            menu(nome)
+
+        case '5':
+            print("Horario [21:00] registrado! Até lá!")
+            input("Pressione Enter para retornar...")
+            menu(nome)
+
+        case '6':
+            atendimento_presencial()
+
+        case _:
+            input("Opção Invalida, Pressione Enter para seguir...")
+            registro_horario()
+
 
 
 def atendimento_presencial():
+    limpar_tela()
     print("==============================================================")
     print("               AGENDA DE ATENDIMENTO")
 
+    esc = input("Bem vindo ao registro de atendimento medico presencial\n1. Registrar horario\n2. Voltar\n")
+    match esc:
+        case '1':
+            registro_horario()
+        case '2':
+            menu(nome)
+        case _:
+            input("Opção Invalida, Pressione Enter para seguir...")
+            atendimento_presencial()
 
-def atendimento_online():
-    print("==============================================================")
-    print("            ATENDIMENTO MEDICO ONLINE")
+    
+
 
 
 def menu(nome):
+    leitor_userinfo_entrada(nome)
+    int(peso)
     limpar_tela()
     print("==============================================================")
     print("                           MENU")
@@ -792,13 +925,37 @@ def menu(nome):
         case '4':
             atendimento_presencial()
         case '5':
-            atendimento_online()
+            atendimento_onl()
         case '6':
             print("Obrigado por usar a VitaTrack. Até logo!")
+            sys.exit()
+
+
+def atendimento_onl():
+    limpar_tela()
+    print("==============================================================")
+    print("            ATENDIMENTO MÉDICO ONLINE")
+
+    # Perguntas adicionais sobre os sintomas
+    febre = input("Você está com febre?\n1. Sim\n2. Não\nEscolha: ") == "1"
+    tosse = input("Você está com tosse?\n1. Sim\n2. Não\nEscolha: ") == "1"
+    dor_cabeca = input("Você está com dor de cabeça?\n1. Sim\n2. Não\nEscolha: ") == "1"
+    falta_ar = input("Você está com falta de ar?\n1. Sim\n2. Não\nEscolha: ") == "1"
+
+    diagnostico = f"Diagnóstico:\nFebre: {'Sim' if febre else 'Não'}\nTosse: {'Sim' if tosse else 'Não'}\nDor de Cabeça: {'Sim' if dor_cabeca else 'Não'}\nFalta de Ar: {'Sim' if falta_ar else 'Não'}"
+
+    diagnostico += "\nRecomendamos que marque um horário presencial para uma avaliação mais detalhada."
+
+    # Imprimir diagnóstico
+    print("\n" + "=" * 30)
+    print(diagnostico)
+    input("Pressione Enter para agendar uma avaliação presencial...")
+    atendimento_presencial()
+
+
 
 
 introdução()
-
 
 
 
